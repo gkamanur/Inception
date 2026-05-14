@@ -1,0 +1,41 @@
+cd ~/42_Projects/Inception
+
+# Build only MariaDB
+docker build -t test-mariadb ./srcs/requirements/mariadb
+
+# Run MariaDB container
+docker run -d --name test-mariadb \
+  -e MYSQL_ROOT_PASSWORD=RootPass123 \
+  -e MYSQL_DATABASE=wordpress \
+  -e MYSQL_USER=wp_user \
+  -e MYSQL_PASSWORD=UserPass123 \
+  -v mariadb_test_volume:/var/lib/mysql \
+  test-mariadb
+
+# Check if it's running
+docker ps | grep test-mariadb
+
+# Check logs
+docker logs test-mariadb
+
+// Test MariaDB Requirements:
+
+# Check if MariaDB is accepting connections
+docker exec test-mariadb mysqladmin -u root -pRootPass123 status
+
+# Test database creation
+docker exec test-mariadb mysql -u root -pRootPass123 -e "SHOW DATABASES;"
+
+# Test user creation
+docker exec test-mariadb mysql -u root -pRootPass123 -e "SELECT User FROM mysql.user;"
+
+# Test WordPress user permissions
+docker exec test-mariadb mysql -u wp_user -pUserPass123 -e "SHOW DATABASES;"
+
+# Test if data persists (stop and restart)
+docker stop test-mariadb
+docker start test-mariadb
+docker exec test-mariadb mysqladmin -u root -pRootPass123 status
+
+# Check volume mount
+docker inspect test-mariadb | grep -A 10 Mounts

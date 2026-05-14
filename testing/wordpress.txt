@@ -1,0 +1,45 @@
+# Build WordPress (needs MariaDB running)
+docker build -t test-wordpress ./srcs/requirements/wordpress
+
+# Run WordPress container (link to MariaDB)
+docker run -d --name test-wordpress \
+  --link test-mariadb:mariadb \
+  -e MYSQL_DATABASE=wordpress \
+  -e MYSQL_USER=wp_user \
+  -e MYSQL_PASSWORD=UserPass123 \
+  -v wordpress_test_volume:/var/www/html \
+  test-wordpress
+
+# Check logs
+docker logs test-wordpress
+
+
+//Test WordPress Requirements:
+
+# Check if PHP-FPM is running
+docker exec test-wordpress ps aux | grep php-fpm
+
+# Check PHP version
+docker exec test-wordpress php -v
+
+# Check if WordPress files are copied
+docker exec test-wordpress ls -la /var/www/html
+
+# Check if wp-config.php exists
+docker exec test-wordpress cat /var/www/html/wp-config.php
+
+# Test PHP-FPM port
+docker exec test-wordpress netstat -tuln | grep 9000
+
+# Test connection to MariaDB from WordPress
+docker exec test-wordpress php -r "
+try {
+    \$pdo = new PDO('mysql:host=mariadb;dbname=wordpress', 'wp_user', 'UserPass123');
+    echo '✅ Database connection successful\n';
+} catch(Exception \$e) {
+    echo '❌ Database connection failed: ' . \$e->getMessage() . '\n';
+}
+"
+
+# Check if WordPress is properly installed
+docker exec test-wordpress curl http://localhost:9000/wp-admin/install.php 2>/dev/null | head -20

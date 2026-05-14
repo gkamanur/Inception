@@ -1,0 +1,44 @@
+# Build NGINX
+docker build -t test-nginx ./srcs/requirements/nginx
+
+# Run NGINX (needs WordPress running)
+docker run -d --name test-nginx \
+  -p 4443:443 \
+  --link test-wordpress:wordpress \
+  -v wordpress_test_volume:/var/www/html \
+  -e DOMAIN_NAME=localhost \
+  test-nginx
+
+# Check if running
+docker ps | grep test-nginx
+
+# Check logs
+docker logs test-nginx
+
+
+//Test NGINX Requirements:
+
+# Check SSL certificate
+docker exec test-nginx ls -la /etc/nginx/ssl/
+
+# Check SSL certificate details
+docker exec test-nginx openssl x509 -in /etc/nginx/ssl/inception.crt -text -noout
+
+# Check TLS protocols
+docker exec test-nginx nginx -T 2>&1 | grep ssl_protocols
+
+# Check if NGINX is listening on 443
+docker exec test-nginx netstat -tuln | grep 443
+
+# Test HTTPS connection from host
+curl -k https://localhost:4443
+
+# Test TLS version (should only accept TLSv1.2/1.3)
+openssl s_client -connect localhost:4443 -tls1_1 2>&1 | grep -i "handshake failure"
+openssl s_client -connect localhost:4443 -tls1_2 2>&1 | grep -i "handshake success"
+
+# Check NGINX config
+docker exec test-nginx nginx -t
+
+# Test reverse proxy to WordPress
+docker exec test-nginx wget -O- http://wordpress:9000 2>&1 | head -10
