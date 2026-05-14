@@ -1,17 +1,27 @@
 #!/bin/bash
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
-    
-    mysqld_safe --datadir=/var/lib/mysql &
-    sleep 3
 
-    mysql -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
-    mysql -e "CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-    mysql -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_USER}\`@'%';"
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
-    mysql -e "FLUSH PRIVILEGES;"
-    
-    mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
-fi
+set -e
 
-exec mysqld_safe --datadir=/var/lib/mysql
+DATADIR="/var/lib/mysql"
+
+mysql_install_db --user=mysql --datadir=$DATADIR
+
+mysqld_safe --datadir=$DATADIR &
+sleep 5
+
+mysql -u root <<EOF
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+
+DROP USER IF EXISTS '${MYSQL_USER}'@'%';
+CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+
+FLUSH PRIVILEGES;
+EOF
+
+mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
+
+exec mysqld_safe --datadir=$DATADIR
