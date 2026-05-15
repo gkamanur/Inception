@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inception Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🐳 Inception Infrastructure Dashboard</h1>
+    <p>Dockerized System Overview & Live Monitoring</p>
+</header>
+
+<section class="diagram">
+    <h2>📊 Architecture Overview</h2>
+    <img src="assets/architecture.png" alt="Architecture">
+</section>
+
+<section class="services">
+    <h2>🧩 Services</h2>
+
+    <div class="grid">
+        <div class="card">
+            <img src="assets/nginx.png">
+            <h3>Nginx</h3>
+            <p>Reverse Proxy / SSL Gateway</p>
+        </div>
+
+        <div class="card">
+            <img src="assets/wordpress.png">
+            <h3>WordPress</h3>
+            <p>CMS Application (PHP-FPM)</p>
+        </div>
+
+        <div class="card">
+            <img src="assets/mariadb.png">
+            <h3>MariaDB</h3>
+            <p>Database Layer</p>
+        </div>
+
+        <div class="card">
+            <img src="assets/redis.png">
+            <h3>Redis</h3>
+            <p>Cache System</p>
+        </div>
+
+        <div class="card">
+            <img src="assets/ftp.png">
+            <h3>FTP</h3>
+            <p>File Transfer Service</p>
+        </div>
+
+        <div class="card">
+            <img src="assets/adminer.png">
+            <h3>Adminer</h3>
+            <p>DB Management UI</p>
+        </div>
+    </div>
+</section>
+
+<section class="live">
+    <h2>📡 Live Container Status</h2>
+
+    <button onclick="loadStatus()">Refresh Status</button>
+
+    <div id="status">Loading...</div>
+</section>
+
+<section class="tests">
+    <h2>🧪 Test Cases</h2>
+
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Test</th>
+            <th>Expected Result</th>
+        </tr>
+
+        <tr>
+            <td>Nginx</td>
+            <td>https://localhost</td>
+            <td>Dashboard loads securely</td>
+        </tr>
+
+        <tr>
+            <td>WordPress</td>
+            <td>/wordpress</td>
+            <td>CMS loads correctly</td>
+        </tr>
+
+        <tr>
+            <td>MariaDB</td>
+            <td>DB connection</td>
+            <td>No connection error</td>
+        </tr>
+
+        <tr>
+            <td>Redis</td>
+            <td>Cache plugin</td>
+            <td>Cache enabled</td>
+        </tr>
+
+        <tr>
+            <td>FTP</td>
+            <td>Upload file</td>
+            <td>File appears in volume</td>
+        </tr>
+    </table>
+</section>
+
+<footer>
+    <p>Inception Project • Docker Infrastructure • 42 School</p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

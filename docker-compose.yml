@@ -1,0 +1,96 @@
+name: inception
+
+services:
+  mariadb:
+    build:
+      context: srcs/requirements/mariadb
+    container_name: mariadb
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    networks:
+      - inception
+
+  wordpress:
+    build:
+      context: srcs/requirements/wordpress
+    container_name: wordpress
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data/wordpress:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
+  nginx:
+    build:
+      context: srcs/requirements/nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "443:443"
+    volumes:
+      - ./data/wordpress:/var/www/html
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+
+  redis:
+    build:
+      context: srcs/requirements/redis
+    container_name: redis
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - inception
+
+  adminer:
+    build:
+      context: srcs/requirements/adminer
+    container_name: adminer
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8081:8080"
+    networks:
+      - inception
+
+  ftp:
+    build:
+      context: srcs/requirements/ftp
+    container_name: ftp
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "21:21"
+      - "40000-40005:40000-40005"
+    volumes:
+      - ./data/wordpress:/home/${FTP_USER}/ftp/files
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+
+  monitor:
+    build: srcs/requirements/monitor-api
+    container_name: monitor
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "5050:5000"
+    networks:
+      - inception
+      
+networks:
+  inception:
+    driver: bridge

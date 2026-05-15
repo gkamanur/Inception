@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && mkdir -p /run/php /var/www/html \
     && chown -R www-data:www-data /run/php /var/www/html
 
-COPY ./mytheme /var/www/html/wp-content/themes/mytheme
+COPY ./mytheme /theme/mytheme
+
 COPY tools/setup.sh /bin/setup.sh
 RUN chmod +x /bin/setup.sh
 
@@ -25,7 +26,6 @@ RUN sed -i 's|^listen = .*|listen = 9000|' \
 RUN mkdir -p /run/php && \
     chown -R www-data:www-data /run/php
 
-# Permissions
 RUN chown -R www-data:www-data /var/www/html
 
 

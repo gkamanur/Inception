@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b1220;
+    color: white;
+}
+
+header {
+    text-align: center;
+    padding: 30px;
+    background: #111a2e;
+}
+
+h1 {
+    margin: 0;
+}
+
+section {
+    padding: 40px;
+    text-align: center;
+}
+
+.diagram img {
+    width: 80%;
+    border-radius: 10px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: #111a2e;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.card img {
+    width: 60px;
+}
+
+button {
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #1e40af;
+}
+
+table {
+    width: 90%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid #444;
+    padding: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #111a2e;
+}

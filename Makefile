@@ -8,11 +8,10 @@ $(NAME):
 	@mkdir -p $(DATA_PATH)/wordpress
 	@mkdir -p $(DATA_PATH)/mariadb
 	@mkdir -p $(DATA_PATH)/ftp_user
-	docker compose -f srcs/docker-compose.yml up -d --build
+	docker compose -f docker-compose.yml up -d --build
 
 clean:
-	@docker compose -f srcs/docker-compose.yml down -v
-	@docker volume ls -q | xargs -r docker volume rm -f
+	@docker compose -f docker-compose.yml down -v
 
 fclean: clean
 	docker system prune -af --volumes

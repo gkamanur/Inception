@@ -15,6 +15,13 @@ if [ ! -f wp-load.php ]; then
     wp core download --allow-root
 fi
 
+# Ensure themes directory exists
+mkdir -p /var/www/html/wp-content/themes
+
+# Copy theme (always ensure it's present)
+if [ ! -d /var/www/html/wp-content/themes/mytheme ]; then
+    cp -r /theme/mytheme /var/www/html/wp-content/themes/mytheme
+fi
 # Create config only if missing
 if [ ! -f wp-config.php ]; then
     wp config create --allow-root \

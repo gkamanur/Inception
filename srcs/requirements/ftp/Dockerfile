@@ -1,6 +1,5 @@
 FROM debian:bullseye-slim
 
-# Install vsftpd and create required directories
 RUN apt-get update && apt-get install -y \
     vsftpd \
     && rm -rf /var/lib/apt/lists/* \
@@ -8,10 +7,8 @@ RUN apt-get update && apt-get install -y \
     && chmod 755 /var/run/vsftpd/empty \
     && chown root:root /var/run/vsftpd/empty
 
-# Create empty userlist
 RUN touch /etc/vsftpd.userlist && chmod 644 /etc/vsftpd.userlist
 
-# Copy entrypoint script
 COPY tools/setup.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
