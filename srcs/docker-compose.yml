@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   mariadb:
     build: requirements/mariadb
@@ -36,19 +34,63 @@ services:
     depends_on:
       - wordpress
 
+  redis:
+    build: ./requirements/redis
+    container_name: redis
+    networks:
+      - inception
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  adminer:
+    build: ./requirements/adminer
+    container_name: adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - inception
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  ftp:
+    build: requirements/ftp
+    container_name: ftp
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "21:21"
+      - "40000-40005:40000-40005"
+    volumes:
+       - wordpress:/home/${FTP_USER}/ftp/files
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+
 volumes:
   mariadb:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ../data/mariadb # Replace login
+      device: ../data/mariadb
+
   wordpress:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ../data/wordpress # Replace login
+      device: ../data/wordpress
+
+  ftp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../data/ftp_user
 
 networks:
   inception:

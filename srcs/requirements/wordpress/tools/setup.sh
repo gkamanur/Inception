@@ -24,6 +24,19 @@ if [ ! -f wp-config.php ]; then
         --dbhost="mariadb"
         
     wp config shuffle-salts --allow-root
+
+    # Redis configuration
+    wp config set WP_REDIS_HOST 'redis' --allow-root
+    wp config set WP_REDIS_PORT 6379 --raw --allow-root
+    wp config set WP_REDIS_PASSWORD "$REDIS_PASSWORD" --allow-root
+    wp config set WP_CACHE true --raw --allow-root
+
+    # FTP Configuration for WordPress updates
+    wp config set FS_METHOD 'ftpext' --allow-root
+    wp config set FTP_HOST 'ftp:21' --allow-root
+    wp config set FTP_USER "$FTP_USER" --allow-root
+    wp config set FTP_PASS "$FTP_PASSWORD" --allow-root
+    wp config set FTP_SSL false --raw --allow-root
 fi
 
 # Install only if not installed
@@ -39,7 +52,31 @@ if ! wp core is-installed --allow-root; then
         "$WP_USER" "$WP_USER_EMAIL" \
         --user_pass="$WP_USER_PASSWORD" \
         --role=author
+    
+    wp theme activate mytheme --allow-root
+
+    # Install and activate Redis Cache plugin
+    wp plugin install redis-cache --activate --allow-root
+
+    # Enable Redis object cache
+    wp redis enable --allow-root
+
+    # Set proper file permissions for FTP
+    chown -R www-data:www-data /var/www/html
+    chmod -R 755 /var/www/html
 fi
 
+# Define FTP constants for WordPress (alternative method)
+if ! grep -q "FTP_HOST" wp-config.php; then
+    cat >> wp-config.php <<EOF
+
+// FTP Settings for automatic updates
+define('FS_METHOD', 'ftpext');
+define('FTP_HOST', 'ftp:21');
+define('FTP_USER', '${FTP_USER}');
+define('FTP_PASS', '${FTP_PASSWORD}');
+define('FTP_SSL', false);
+EOF
+fi
 
 exec php-fpm8.3 -F
