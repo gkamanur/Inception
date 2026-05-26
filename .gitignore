@@ -1,0 +1,15 @@
+# Secrets (passwords, keys)
+secrets/
+
+# Environment variables (contains sensitive config)
+srcs/.env
+.env
+
+# Persistent data volumes
+data/
+
+# OS / Editor
+.DS_Store
+*.swp
+*.swo
+*~

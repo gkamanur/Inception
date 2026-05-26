@@ -62,52 +62,25 @@
 
 <section class="live">
     <h2>📡 Live Container Status</h2>
-
-    <button onclick="loadStatus()">Refresh Status</button>
-
+    <button onclick="loadStatus()">Refresh All</button>
     <div id="status">Loading...</div>
 </section>
 
-<section class="tests">
-    <h2>🧪 Test Cases</h2>
+<section class="health">
+    <h2>💓 Service Health Checks</h2>
+    <p>Tests actual port connectivity for each service</p>
+    <div id="health">Loading...</div>
+</section>
 
-    <table>
-        <tr>
-            <th>Service</th>
-            <th>Test</th>
-            <th>Expected Result</th>
-        </tr>
+<section class="connectivity">
+    <h2>🔗 Container Connectivity Map</h2>
+    <p>Verifies inter-container communication paths</p>
+    <div id="connectivity">Loading...</div>
+</section>
 
-        <tr>
-            <td>Nginx</td>
-            <td>https://localhost</td>
-            <td>Dashboard loads securely</td>
-        </tr>
-
-        <tr>
-            <td>WordPress</td>
-            <td>/wordpress</td>
-            <td>CMS loads correctly</td>
-        </tr>
-
-        <tr>
-            <td>MariaDB</td>
-            <td>DB connection</td>
-            <td>No connection error</td>
-        </tr>
-
-        <tr>
-            <td>Redis</td>
-            <td>Cache plugin</td>
-            <td>Cache enabled</td>
-        </tr>
-
-        <tr>
-            <td>FTP</td>
-            <td>Upload file</td>
-            <td>File appears in volume</td>
-        </tr>
-    </table>
+<section class="failures">
+    <h2>🚨 Failure Report</h2>
+    <div id="failures">Checking...</div>
 </section>
 
 <footer>

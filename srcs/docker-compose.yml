@@ -1,0 +1,130 @@
+name: inception
+
+services:
+  mariadb:
+    build:
+      context: requirements/mariadb
+    container_name: mariadb
+    restart: always
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - db_root_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception
+
+  wordpress:
+    build:
+      context: requirements/wordpress
+    container_name: wordpress
+    restart: always
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - credentials
+      - redis_password
+      - ftp_password
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
+  nginx:
+    build:
+      context: requirements/nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - wordpress
+      - monitor
+    networks:
+      - inception
+
+  redis:
+    build:
+      context: requirements/redis
+    container_name: redis
+    restart: always
+    secrets:
+      - redis_password
+    networks:
+      - inception
+
+  adminer:
+    build:
+      context: requirements/adminer
+    container_name: adminer
+    restart: always
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
+  ftp:
+    build:
+      context: requirements/ftp
+    container_name: ftp
+    restart: always
+    env_file:
+      - .env
+    secrets:
+      - ftp_password
+    ports:
+      - "21:21"
+      - "40000-40005:40000-40005"
+    volumes:
+      - wordpress_data:/home/${FTP_USER}/ftp/files
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+
+  monitor:
+    build:
+      context: requirements/monitor-api
+    container_name: monitor
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - inception
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/guruvenu/data/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/guruvenu/data/wordpress
+
+networks:
+  inception:
+    driver: bridge
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  credentials:
+    file: ../secrets/credentials.txt
+  redis_password:
+    file: ../secrets/redis_password.txt
+  ftp_password:
+    file: ../secrets/ftp_password.txt

@@ -13,3 +13,96 @@ body {
 h1 {
     font-size: 60px;
 }
+
+/* ── Success message ── */
+.success {
+    background: #166534;
+    color: #bbf7d0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+/* ── Comment form ── */
+.comment-form {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #1a1a2e;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: left;
+}
+.comment-form h2 {
+    text-align: center;
+    margin-top: 0;
+}
+.comment-form label {
+    display: block;
+    margin: 12px 0 4px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+.comment-form input[type="text"],
+.comment-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #0f172a;
+    color: white;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.comment-form textarea {
+    resize: vertical;
+}
+.comment-form button {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.comment-form button:hover {
+    background: #1d4ed8;
+}
+
+/* ── Stored comments ── */
+.comments-list {
+    max-width: 500px;
+    margin: 40px auto;
+    text-align: left;
+}
+.no-comments {
+    color: #94a3b8;
+    text-align: center;
+}
+.comment-card {
+    background: #1a1a2e;
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+.comment-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+.comment-meta strong {
+    color: #60a5fa;
+}
+.comment-meta span {
+    color: #64748b;
+}
+.comment-card p {
+    margin: 0;
+    color: #e2e8f0;
+    line-height: 1.5;
+}

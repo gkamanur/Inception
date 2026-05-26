@@ -1,11 +1,16 @@
 #!/bin/bash
 
 FTP_USER=${FTP_USER:-ftpuser}
-FTP_PASSWORD=${FTP_PASSWORD:-ftppass}
+
+# Read password from Docker secret (fall back to env var)
+if [ -f /run/secrets/ftp_password ]; then
+    FTP_PASSWORD=$(cat /run/secrets/ftp_password)
+else
+    FTP_PASSWORD=${FTP_PASS:-ftppass}
+fi
 
 echo "=== FTP Server Setup ==="
 echo "User: $FTP_USER"
-echo "Password: $FTP_PASSWORD"
 
 # Ensure required directories exist
 mkdir -p /var/run/vsftpd/empty

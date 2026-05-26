@@ -1,23 +1,22 @@
 NAME = inception
 
-DATA_PATH = $(CURDIR)/data
+DATA_PATH = /home/guruvenu/data
+COMPOSE = docker compose -f srcs/docker-compose.yml
 
 all: $(NAME)
 
 $(NAME):
 	@mkdir -p $(DATA_PATH)/wordpress
 	@mkdir -p $(DATA_PATH)/mariadb
-	@mkdir -p $(DATA_PATH)/ftp_user
-	docker compose -f docker-compose.yml up -d --build
+	$(COMPOSE) up -d --build
 
 clean:
-	@docker compose -f docker-compose.yml down -v
+	$(COMPOSE) down -v
 
 fclean: clean
 	docker system prune -af --volumes
 	@sudo rm -rf $(DATA_PATH)/wordpress/*
 	@sudo rm -rf $(DATA_PATH)/mariadb/*
-	@sudo rm -rf $(DATA_PATH)/ftp_user/*
 
 re: fclean all
 

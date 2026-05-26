@@ -1,7 +1,18 @@
 #!/bin/bash
 set -e
 
-cd /var/www/html
+# ── Read passwords from Docker secrets (fall back to env vars) ──
+[ -f /run/secrets/db_password ]    && MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+[ -f /run/secrets/credentials ]    && WP_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
+[ -f /run/secrets/redis_password ] && REDIS_PASSWORD=$(cat /run/secrets/redis_password)
+[ -f /run/secrets/ftp_password ]   && FTP_PASS=$(cat /run/secrets/ftp_password)
+
+# Non-admin user password: derived from admin password with a suffix
+WP_USER_PASSWORD="${WP_ADMIN_PASSWORD}_user"
+
+WPDIR="/var/www/html/wordpress"
+mkdir -p $WPDIR
+cd $WPDIR
 
 # Install WP-CLI if missing
 if ! command -v wp >/dev/null 2>&1; then
@@ -16,12 +27,10 @@ if [ ! -f wp-load.php ]; then
 fi
 
 # Ensure themes directory exists
-mkdir -p /var/www/html/wp-content/themes
+mkdir -p $WPDIR/wp-content/themes
 
-# Copy theme (always ensure it's present)
-if [ ! -d /var/www/html/wp-content/themes/mytheme ]; then
-    cp -r /theme/mytheme /var/www/html/wp-content/themes/mytheme
-fi
+# Always sync theme files (overwrite with latest from image)
+cp -rf /theme/mytheme $WPDIR/wp-content/themes/
 # Create config only if missing
 if [ ! -f wp-config.php ]; then
     wp config create --allow-root \
@@ -42,7 +51,7 @@ if [ ! -f wp-config.php ]; then
     wp config set FS_METHOD 'ftpext' --allow-root
     wp config set FTP_HOST 'ftp:21' --allow-root
     wp config set FTP_USER "$FTP_USER" --allow-root
-    wp config set FTP_PASS "$FTP_PASSWORD" --allow-root
+    wp config set FTP_PASS "$FTP_PASS" --allow-root
     wp config set FTP_SSL false --raw --allow-root
 fi
 
@@ -69,8 +78,8 @@ if ! wp core is-installed --allow-root; then
     wp redis enable --allow-root
 
     # Set proper file permissions for FTP
-    chown -R www-data:www-data /var/www/html
-    chmod -R 755 /var/www/html
+    chown -R www-data:www-data $WPDIR
+    chmod -R 755 $WPDIR
 fi
 
 # Define FTP constants for WordPress (alternative method)
@@ -81,7 +90,7 @@ if ! grep -q "FTP_HOST" wp-config.php; then
 define('FS_METHOD', 'ftpext');
 define('FTP_HOST', 'ftp:21');
 define('FTP_USER', '${FTP_USER}');
-define('FTP_PASS', '${FTP_PASSWORD}');
+define('FTP_PASS', '${FTP_PASS}');
 define('FTP_SSL', false);
 EOF
 fi
