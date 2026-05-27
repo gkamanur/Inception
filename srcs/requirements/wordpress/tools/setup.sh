@@ -26,6 +26,21 @@ if [ ! -f wp-load.php ]; then
     wp core download --allow-root
 fi
 
+# Wait for MariaDB to be ready (use mysql client directly since wp-config.php doesn't exist yet)
+echo "Waiting for MariaDB..."
+for i in $(seq 1 30); do
+    if mysql -h mariadb -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "SELECT 1;" >/dev/null 2>&1; then
+        echo "MariaDB is ready!"
+        break
+    fi
+    if [ $i -eq 30 ]; then
+        echo "ERROR: MariaDB did not become ready in time."
+        exit 1
+    fi
+    echo "MariaDB not ready yet... attempt $i/30"
+    sleep 2
+done
+
 # Ensure themes directory exists
 mkdir -p $WPDIR/wp-content/themes
 

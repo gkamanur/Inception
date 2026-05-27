@@ -15,6 +15,12 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - inception
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$(cat /run/secrets/db_root_password) --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   wordpress:
     build:
@@ -31,7 +37,8 @@ services:
     volumes:
       - wordpress_data:/var/www/html
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     networks:
       - inception
 
@@ -66,7 +73,8 @@ services:
     container_name: adminer
     restart: always
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     networks:
       - inception
 
@@ -105,13 +113,13 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/guruvenu/data/mariadb
+      device: ${DATA_PATH}/mariadb
   wordpress_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/guruvenu/data/wordpress
+      device: ${DATA_PATH}/wordpress
 
 networks:
   inception:
