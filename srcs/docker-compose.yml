@@ -82,7 +82,12 @@ services:
     build:
       context: requirements/ftp
     container_name: ftp
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/ftp-healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     env_file:
       - .env
     secrets:

@@ -86,3 +86,26 @@ AI was used for:
 - **Bind mounts**: Map a host directory directly into the container (`./data:/var/lib/mysql`). Tight coupling to host filesystem.
 - **Named volumes**: Managed by Docker. Can use drivers and options. Portable and cleaner in compose files.
 - **This project**: Uses named volumes with `local` driver and `device` option to store data at `/home/gkamanur/data/` — combines named volume benefits with a predictable host path.
+  
+# Standard way (modern Docker)
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: bind
+      device: ${DATA_PATH}/wordpress
+
+# Alternative standard way
+volumes:
+  wordpress_data:
+    external: true
+    name: ${DATA_PATH}/wordpress
+
+# Your current way (legacy/compatibility)
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH}/wordpress

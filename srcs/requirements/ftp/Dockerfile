@@ -1,17 +1,27 @@
+# Dockerfile for FTP container
 FROM debian:bullseye-slim
 
+# Install vsftpd and dependencies
 RUN apt-get update && apt-get install -y \
     vsftpd \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /var/run/vsftpd/empty \
-    && chmod 755 /var/run/vsftpd/empty \
-    && chown root:root /var/run/vsftpd/empty
+    curl \
+    procps \
+    logrotate \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN touch /etc/vsftpd.userlist && chmod 644 /etc/vsftpd.userlist
+# Copy the fixed setup script
+COPY tools/setup.sh  /usr/local/bin/
+RUN chmod +x /usr/local/bin/setup.sh
 
-COPY tools/setup.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Create necessary directories
+RUN mkdir -p /var/run/vsftpd
 
-EXPOSE 21 40000-40005
+# Expose ports
+EXPOSE 20 21 40000-40005
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /usr/local/bin/ftp-healthcheck.sh
+
+# Run setup script
+CMD ["/usr/local/bin/setup.sh"]
